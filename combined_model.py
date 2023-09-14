@@ -168,5 +168,5 @@ if __name__ == '__main__':
 sample_digit_pixels = mnist_df.iloc[0, 1:].values
 
 # Visualize reconstructions for RP 
-plot_reconstructed_images(sample_digit_pixels, [2, 20, 50, 75, 100, 200, 300, 400, 500, 784])
+plot_reconstructed_images(sample_digit_pixels, [2, 20, 50, 75, 100, 200, 300, 400, 500, 600, 700, 784])
 
