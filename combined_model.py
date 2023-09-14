@@ -121,6 +121,36 @@ def plot_time_vs_k(k_values, w_generation_times):
     plt.savefig("time_vs_k.png")
     plt.show()
 
+def plot_reconstructed_images(X, k_values):
+
+    # Calculate the number of rows based on the number of k_values
+    num_rows = len(k_values) // 2 + len(k_values) % 2 + 1  # +1 for the original image
+    
+    # Define a figure
+    fig = plt.figure(figsize=(10, 2 * num_rows))
+    
+    # Plot the original image
+    ax = plt.subplot(num_rows, 2, 1)
+    plt.imshow(X.reshape(28, 28), cmap='gray')
+    ax.set_title('Original Image')
+    plt.axis('off')
+    
+    for i, k in enumerate(k_values, start=1):
+        _, X_hat, w_gen_time = matrix_random_projection(X.reshape(1, -1), k) # flatten from 28x28 -> 1x768
+
+        # Compute the RMSE for the reconstruction
+        rmse = np.sqrt(np.mean((X - X_hat)**2))
+        
+        # Plot
+        ax = plt.subplot(num_rows, 2, i + 2)  # +2 to account for the original image
+        plt.imshow(X_hat.reshape(28, 28), cmap='gray')
+        ax.set_title(f'k={k}, RMSE={rmse:.4f}, W gen time={w_gen_time:.4f} s')
+        plt.axis('off')
+
+    plt.tight_layout()
+    plt.savefig("reconstructed_images_RP.png")
+    plt.show()
+
 if __name__ == '__main__':
 
     # Load the CSV file into a DataFrame
@@ -133,12 +163,10 @@ if __name__ == '__main__':
     # Call the function to generate the comparison plot
     #compare_rmse_vs_k(data_df.values, k_values_range)
 
-    # Extract the first sample's pixel values and reshape it to a 28x28 matrix
-    sample_digit = mnist_df.iloc[0, 1:].values.reshape(28, 28)
 
-    # Plot the digit
-    plt.imshow(sample_digit, cmap='gray')
-    plt.axis('off')
-    plt.title(f"Label: {mnist_df.iloc[0, 0]}")
-    plt.show()
+
+sample_digit_pixels = mnist_df.iloc[0, 1:].values
+
+# Visualize reconstructions for RP 
+plot_reconstructed_images(sample_digit_pixels, [2, 20, 50, 75, 100, 200, 300, 400, 500, 784])
 
