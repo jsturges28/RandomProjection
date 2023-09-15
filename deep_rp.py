@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import time
 
-def deep_random_projection(x, k):
+def deep_random_projection(X, k):
     # Ensure p >= k
-    p = x.shape[1]
+    p = X.shape[1]
     if p < k:
         raise ValueError("k should be less than or equal to p")
     
