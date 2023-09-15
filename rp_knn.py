@@ -62,12 +62,10 @@ def visualize_reconstructions(data, reconstructed_data, k_values, num_samples=10
     plt.savefig("reconstructed_images_RP.png")
     plt.show()
 
-
-
 if __name__ == '__main__':
 
     # Load the MNIST dataset
-    mnist_df = pd.read_csv("mnist_test.csv")
+    mnist_df = pd.read_csv("mnist_train.csv")
 
     # Select a subset of the dataset for our experiment
     num_samples = 500
