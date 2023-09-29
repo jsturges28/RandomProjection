@@ -48,30 +48,65 @@ def compute_rmse(original, reconstructed):
     rmse = np.sqrt(mse)
     return rmse
 
-def plot_ddrp_rmse_vs_k(X, k_values):
+# Implementing functions for PCA and vanilla random projection
+
+def pca_projection_reconstruction(X, k):
+    """Project and reconstruct data using PCA."""
+    pca = PCA(n_components=k)
+    X_projected = pca.fit_transform(X)
+    X_reconstructed = pca.inverse_transform(X_projected)
+    return X_reconstructed
+
+def vanilla_random_projection(X, k):
+    """Project and reconstruct data using vanilla random projection."""
+    m, n = X.shape
+    R = np.random.randn(n, k)
+
+    # Orthogonalize the columns of R
+    R = gram_schmidt_columns(R)
+
+    X_projected = np.dot(X, R)
+    X_reconstructed = np.dot(X_projected, R.T)
+    return X_reconstructed
+
+def plot_rmse_vs_k(X, k_values):
     """
-    Plot RMSE values against k for data-dependent random projection.
+    Plot RMSE values against k for data-dependent random projection, PCA, and vanilla random projection.
     
     Parameters:
     - X: Input matrix of shape (n_samples, n_features)
     - k_values: List of k values to consider for random projection
     """
-    rmse_values = []
+    rmse_ddrp = []
+    rmse_pca = []
+    rmse_vrp = []
 
     for k in k_values:
-        R_k, x_projected = data_dependent_random_projection(X, k)
-        x_reconstructed = np.dot(R_k, x_projected)
-        rmse = compute_rmse(X, x_reconstructed)
-        rmse_values.append(rmse)
+        # Data-dependent random projection
+        R_k, x_projected_ddrp = data_dependent_random_projection(X, k)
+        x_reconstructed_ddrp = np.dot(R_k, x_projected_ddrp)
+        rmse_ddrp.append(compute_rmse(X, x_reconstructed_ddrp))
 
+        # PCA
+        x_reconstructed_pca = pca_projection_reconstruction(X, k)
+        rmse_pca.append(compute_rmse(X, x_reconstructed_pca))
+
+        # Vanilla random projection
+        x_reconstructed_vrp = vanilla_random_projection(X, k)
+        rmse_vrp.append(compute_rmse(X, x_reconstructed_vrp))
+
+    # Plotting
     plt.figure(figsize=(12, 8))
-    plt.plot(k_values, rmse_values, marker='o', linestyle='-')
+    plt.plot(k_values, rmse_ddrp, marker='o', linestyle='-', label="Data-Dependent Random Projection")
+    plt.plot(k_values, rmse_pca, marker='x', linestyle='--', label="PCA")
+    plt.plot(k_values, rmse_vrp, marker='.', linestyle='-.', label="Vanilla Random Projection")
     
-    plt.title('k vs. RMSE for Data-Dependent Random Projection')
+    plt.title('k vs. RMSE for Different Projection Methods')
     plt.xlabel('k (Number of Projected Dimensions)')
     plt.ylabel('RMSE')
+    plt.legend()
     plt.grid(True)
-    plt.savefig("rmse_ddrp_k.png")
+    plt.savefig("rmse_vs_k_comparison.png")
     plt.show()
 
 if __name__ == '__main__':
@@ -105,7 +140,7 @@ if __name__ == '__main__':
     k_values = list(range(0, 101))
 
     # Plot RMSE vs k for data-dependent random projection
-    plot_ddrp_rmse_vs_k(X, k_values)
+    plot_rmse_vs_k(X, k_values)
 
 
 
